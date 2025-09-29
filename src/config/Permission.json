@@ -1,0 +1,38 @@
+[
+  {
+    "id": 1,
+    "name": "article",
+    "status": 1,
+    "read": true,
+    "create": true,
+    "update": true,
+    "delete": true
+  },
+  {
+    "id": 2,
+    "name": "article.articles",
+    "status": 1,
+    "read": true,
+    "create": true,
+    "update": true,
+    "delete": true
+  },
+  {
+    "id": 3,
+    "name": "article.calendar",
+    "status": 1,
+    "read": true,
+    "create": true,
+    "update": true,
+    "delete": true
+  },
+  {
+    "id": 4,
+    "name": "article.categories",
+    "status": 1,
+    "read": true,
+    "create": true,
+    "update": true,
+    "delete": true
+  }
+]
