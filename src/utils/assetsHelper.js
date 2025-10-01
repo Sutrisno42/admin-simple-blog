@@ -31,7 +31,7 @@ export function getAsset(path) {
 
 export function getStorage(path) {
   if (path != null) {
-    return import.meta.env.VITE_APP_ASSET_URL + "/storage/" + path;
+    return import.meta.env.VITE_APP_ASSET_URL + path;
   } else {
     return "#";
   }

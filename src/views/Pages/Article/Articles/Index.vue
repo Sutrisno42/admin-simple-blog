@@ -63,7 +63,7 @@ const state = reactive({
       hidden: false,
       width: "15%",
       label: "Author",
-      name: "author",
+      name: "author?.name",
       icon: "me-1 ri-file-list-3-line text-success",
       // routeName: "user.detail",
       params: "id",
@@ -285,9 +285,9 @@ onMounted(() => {
                 >
                   {{ formatDefaultDate(row[column.name]) }}
                 </div>
-                <div v-else-if="column.name === 'author'">
+                <div v-else-if="column.name === 'author?.name'">
                   <i class="las la-user me-1 text-success"></i>
-                  {{ row.author?.username || "-" }}
+                  {{ row.author?.name || "-" }}
                 </div>
                 <div v-else-if="column.name === 'image'" :class="column.class">
                   <span class="badge bg-success text-center">{{

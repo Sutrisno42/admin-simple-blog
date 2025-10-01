@@ -16,7 +16,7 @@ const state = reactive({
     {
       width: "50%",
       label: "Category",
-      name: "title",
+      name: "name",
       class: "text-uppercase fw-semibold",
       custom: {
         icon: "me-1 ri-bookmark-3-line text-success ",
@@ -26,14 +26,14 @@ const state = reactive({
       sortable: true,
       filterable: true,
     },
-    {
-      width: "5%",
-      label: "Articles",
-      name: "articleCounts",
-      class: "text-uppercase fw-semibold",
-      sortable: true,
-      filterable: true,
-    },
+    // {
+    //   width: "5%",
+    //   label: "Articles",
+    //   name: "articleCounts",
+    //   class: "text-uppercase fw-semibold",
+    //   sortable: true,
+    //   filterable: true,
+    // },
   ],
   data: [],
   formData: {},
@@ -42,7 +42,7 @@ const state = reactive({
 });
 
 const addSchema = yup.object({
-  title: yup
+  name: yup
     .string()
     .required("Title is required")
     .min(3, "Title must be at least 3 characters"),
@@ -51,7 +51,7 @@ const addSchema = yup.object({
 const fetchData = async () => {
   try {
     await apiClient.get("/categories").then((res) => {
-      state.data = res.result || [];
+      state.data = res || [];
     });
   } catch (error) {
     handleError(error);

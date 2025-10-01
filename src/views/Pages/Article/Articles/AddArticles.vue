@@ -78,7 +78,11 @@ async function submitAdd(values) {
     formData.append("author_id", user.id);
     formData.append("category_id", values.category_id);
     formData.append("image", values.image);
-    formData.append("tags", values.tags || []);
+    if (values.tags && Array.isArray(values.tags)) {
+      values.tags.forEach((tag, index) => {
+        formData.append(`tags[${index}]`, tag);
+      });
+    }
 
     await apiClient.post("/blogs", formData, {
       headers: { "Content-Type": "multipart/form-data" },
@@ -206,9 +210,9 @@ onMounted(() => {
           </div>
           <div class="mb-3">
             <InputTags
-              name="tag"
+              name="tags"
               :disabled="state.isLoading"
-              v-model="state.formData.tag"
+              v-model="state.formData.tags"
             />
           </div>
         </template>

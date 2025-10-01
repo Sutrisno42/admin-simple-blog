@@ -25,6 +25,7 @@ import { isAdmin } from "@/utils/isAdmin";
 import { useAuthStore } from "@/stores/auth";
 import InputFlatPickr from "@/components/Input/InputFlatPickr.vue";
 import apiClient from "@/service/ApiClientService";
+import { getAvatar, getStorage } from "@/utils/assetsHelper";
 
 const { slug } = useRoute().params;
 const authStore = useAuthStore();
@@ -67,7 +68,7 @@ const updateSchema = yup.object({
   // status: yup.boolean().required("Status is required"),
   published_date: yup.date().required("Published date is required"),
   // vidio_url: yup.string().optional().nullable(),
-  tag: yup.array().of(yup.string()),
+  tags: yup.array().of(yup.string()),
   category_id: yup.array().min(1, "At least one category must be selected"),
 });
 
@@ -124,6 +125,7 @@ async function deleteData() {
     router.push({ name: "article.articles" });
   } catch (error) {
     handleError(error);
+    console.log('update', handleError)
   }
 }
 
@@ -131,26 +133,14 @@ const fetchData = async () => {
   try {
     const res = await apiClient.get(`/blogs/${slug}`);
 
-    state.result = res;
-    state.result.author = res?.author_id?.id;
-    state.selectedCategories =
-      res?.category?.map((category) => category.id) || [];
+    state.result = res.data;
+    state.selectedCategories = res.data.category
+      ? [res.data.category.id]
+      : [];
   } catch (error) {
     handleError(error);
   }
 };
-
-const imageUrl = computed(() => {
-  if (state.result.image) {
-    return state.result.image;
-  }
-  // Fallback jika image_url tidak ada
-  if (state.result.image) {
-    return `/storage/${state.result.image}`;
-  }
-  // Default placeholder image
-  return '/images/placeholder.jpg';
-});
 
 const fetchCategory = async () => {
   try {
@@ -159,20 +149,6 @@ const fetchCategory = async () => {
       id: item.id,
       name: item.name,
     }));
-  } catch (error) {
-    console.log(error);
-    handleError(error);
-  }
-};
-
-const fetchAuthor = async () => {
-  try {
-    await apiClient.get("/auth/user").then((res) => {
-      state.users = res.data.map((item) => ({
-        id: item.id,
-        name: item.name,
-      }));
-    });
   } catch (error) {
     console.log(error);
     handleError(error);
@@ -193,7 +169,7 @@ const flatpickrConfig = {
 
 onMounted(async () => {
   try {
-    await Promise.all([fetchData(), fetchCategory(), fetchAuthor()]);
+    await Promise.all([fetchData(), fetchCategory()]);
   } catch (e) {
     console.error("Error salah satu:", e);
   }
@@ -277,8 +253,16 @@ onMounted(async () => {
           <div class="mb-3 text-info border-bottom pb-3">
             <label for="formFile" class="form-label">Image</label>
             <div class="mb-3">
-              <img :src="imageUrl" alt="" width="100%" />
-              <button type="button" class="btn btn-warning btn-sm mt-2" @click="showModal">
+              <img
+                :src="getStorage(state.result.image_url)"
+                alt=""
+                width="100%"
+              />
+              <button
+                type="button"
+                class="btn btn-warning btn-sm mt-2"
+                @click="showModal"
+              >
                 <i class="las la-pen"></i> Change Image
               </button>
             </div>
@@ -301,32 +285,9 @@ onMounted(async () => {
               :model-value="state.result.slug"
             />
           </div>
-
-          <!-- <div class="mb-3 text-info border-bottom pb-3">
-            <InputMultiSelect
-              name="status"
-              :model-value="state.result.status"
-              :options="[
-                { label: 'Published', value: true },
-                { label: 'Draft/Unpublish', value: false },
-              ]"
-              field-label="Status"
-              placeholder="Select status"
-              valueProp="value"
-            />
-          </div>
-          <div class="mb-3 text-info border-bottom pb-3">
-            <InputFlatPickr
-              name="published_date"
-              :model-value="state.result.published_date"
-              label="Publish Date"
-              :config="flatpickrConfig"
-              :disabled="state.isLoading"
-            />
-          </div> -->
           <div class="mb-3 text-info">
             <InputCheckboxGroup
-              name="category_id"
+              name="category"
               :categories="state.categories"
               :model-value="state.selectedCategories"
             />
@@ -335,16 +296,6 @@ onMounted(async () => {
           <div class="mb-3 text-info border-bottom pb-3">
             <InputTags name="tags" :model-value="state.result.tags" />
           </div>
-
-          <!-- <div class="mb-3 text-info border-bottom pb-3">
-            <InputBase
-              label="Youtube Video ID"
-              type="text"
-              name="vidio_url"
-              v-model="state.result.vidio_url"
-              is-optional
-            />
-          </div> -->
           <!-- <div
             class="mb-3 text-info border-bottom pb-3"
             v-if="isAdmin(state.role)"
@@ -386,13 +337,13 @@ onMounted(async () => {
           >
             <div class="row text-muted">
               <div class="col-md-6">
-                Created: {{ formatDefaultDate(state.result.created_at) }}
+                <!-- Created: {{ formatDefaultDate(state.result.created_at) }} -->
                 <!-- by -->
                 <!-- {{ state.result?.author?.username || "no users" }} -->
               </div>
               <div class="col-md-6" v-if="state.result.updated_at">
                 Modified:
-                {{ formatDefaultDate(state.result.updated_at) }}
+                <!-- {{ formatDefaultDate(state.result.updated_at) }} -->
                 <!-- by -->
                 <!-- {{ state.result?.author?.username || "no users" }} -->
               </div>
